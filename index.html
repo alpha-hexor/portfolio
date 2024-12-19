@@ -125,6 +125,10 @@
             </div>
         </div>
     </section>
+    <section>
+	    <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+	    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+    </section>
     <section id="tools" class="tools">
         <div class="tools-container">
             <h1>Tools I Use</h1>
@@ -570,6 +574,71 @@
                 }
             });
         });
+
+    </script>
+
+    <script>
+	    window.onload = async function () {
+		try {
+		    // Fetch data from data.json
+		    const response = await fetch("data.json");
+		    const data = await response.json();
+		    // Extract values from JSON
+		    const easySolved = data.EASY_SOLVED;
+		    const mediumSolved = data.MEDIUM_SOLVED;
+		    const hardSolved = data.HARD_SOLVED;
+		    const totalEasy = data.TOTAL_EASY;
+		    const totalMedium = data.TOTAL_MEDIUM;
+		    const totalHard = data.TOTAL_HARD;
+		    // Calculate total questions solved
+		    const totalSolved = easySolved + mediumSolved + hardSolved;
+		    const totalQuestions = totalEasy + totalMedium + totalHard;
+		    // Chart Configuration
+		    var chart = new CanvasJS.Chart("chartContainer", {
+			theme: "dark2", // Changed to "light1" theme
+			exportFileName: "Doughnut Chart",
+			animationEnabled: true,
+			title: {
+			    text: "Question Solving Progress"
+			},
+			legend: {
+			    cursor: "pointer",
+			    itemclick: explodePie
+			},
+			data: [{
+			    type: "doughnut",
+			    innerRadius: 70,
+			    showInLegend: true,
+			    toolTipContent: "<b>{name}</b>: {y} / {total}", // Tooltip content
+			    indexLabel: "{name}: {y}/{total}",              // Display label
+			    dataPoints: [
+				{ y: easySolved, total: totalEasy, name: "Easy" },
+				{ y: mediumSolved, total: totalMedium, name: "Medium" },
+				{ y: hardSolved, total: totalHard, name: "Hard" }
+			    ]
+			}],
+			title: {
+			    text: `My Leetcode Stat: ${totalSolved}/${totalQuestions}`,
+			    fontWeight: "normal",
+			    fontSize: 24,
+			    padding: 20
+			}
+		    });
+		    chart.render();
+		    // Function to explode pie segments
+		    function explodePie(e) {
+			if (typeof (e.dataSeries.dataPoints[e.dataPointIndex].exploded) === "undefined" ||
+			    !e.dataSeries.dataPoints[e.dataPointIndex].exploded) {
+			    e.dataSeries.dataPoints[e.dataPointIndex].exploded = true;
+			} else {
+			    e.dataSeries.dataPoints[e.dataPointIndex].exploded = false;
+			}
+			e.chart.render();
+		    }
+		} catch (error) {
+		    console.error("Error loading data.json:", error);
+		}
+    }
 
     </script>
    
